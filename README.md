@@ -1,0 +1,2 @@
+# FriedProjects.github.io
+Сайт
