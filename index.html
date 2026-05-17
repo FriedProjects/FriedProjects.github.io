@@ -3,249 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FPDev | Разработка плагинов Minecraft</title>
+    <title>FPDev — Современные решения для Minecraft</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
-            background: linear-gradient(135deg, #0D0D0D 0%, #1A1A1A 50%, #0D0D0D 100%);
-            font-family: 'Segoe UI', 'Inter', sans-serif;
+            background: #030303;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            position: relative;
             overflow-x: hidden;
         }
-        
-        body::before {
-            content: '';
+
+        /* Анимированный фон */
+        .bg-animation {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                radial-gradient(2px 2px at 20% 30%, rgba(245,166,35,0.3), transparent),
-                radial-gradient(2px 2px at 40% 70%, rgba(0,255,255,0.2), transparent),
-                radial-gradient(2px 2px at 60% 20%, rgba(245,166,35,0.3), transparent),
-                radial-gradient(2px 2px at 80% 60%, rgba(0,255,255,0.2), transparent),
-                radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.1), transparent),
-                radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.1), transparent);
-            animation: floatParticles 15s ease-in-out infinite;
+            z-index: -2;
+            background: radial-gradient(ellipse at 20% 50%, rgba(245, 166, 35, 0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(0, 255, 255, 0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 80%, rgba(245, 166, 35, 0.04) 0%, transparent 50%);
         }
-        
-        @keyframes floatParticles {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
         }
-        
+
         .container {
-            max-width: 440px;
-            width: 100%;
-            text-align: center;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 20px;
             position: relative;
             z-index: 1;
         }
-        
-        .avatar-wrapper {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
-            position: relative;
-            border-radius: 35px;
-            background: linear-gradient(45deg, #F5A623, #FFD700, #00FFFF, #F5A623);
-            background-size: 300% 300%;
-            animation: avatarGlow 4s ease-in-out infinite;
-            padding: 3px;
+
+        /* Шапка в стиле стекла */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            margin-bottom: 50px;
+            background: rgba(15, 15, 15, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 60px;
+            flex-wrap: wrap;
+            gap: 20px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
         }
-        
-        .avatar {
+
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -1px;
+        }
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #F5A623, #FFD700);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 8px 25px rgba(245,166,35,0.3);
+        }
+        .logo span { color: #F5A623; }
+
+        .nav {
+            display: flex;
+            gap: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 40px;
+            padding: 6px;
+        }
+        .nav a {
+            color: #888;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .nav a:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav a.active { 
+            color: #0D0D0D; 
+            background: #F5A623; 
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(245,166,35,0.3);
+        }
+
+        .search-wrapper {
+            position: relative;
+        }
+        .search-bar {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 50px;
+            padding: 12px 20px 12px 45px;
+            width: 260px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            backdrop-filter: blur(10px);
+        }
+        .search-bar:focus {
+            border-color: #F5A623;
+            box-shadow: 0 0 30px rgba(245,166,35,0.15);
+            width: 300px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 18px; top: 50%; transform: translateY(-50%);
+            color: #666;
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        /* Секции */
+        .section {
+            display: none;
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .section.active { display: block; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Заголовок секции */
+        .section-title {
+            font-size: 40px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff 0%, #888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .section-subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        /* Сетка */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* Карточка — стеклянная */
+        .card {
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 30px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            position: relative;
+            group: true;
+        }
+        .card:hover {
+            border-color: rgba(245,166,35,0.3);
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 40px rgba(245,166,35,0.1);
+        }
+
+        .card-image {
             width: 100%;
-            height: 100%;
-            border-radius: 32px;
-            background: linear-gradient(145deg, #2D2D2D, #1A1A1A);
+            height: 200px;
+            background: rgba(255,255,255,0.02);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 55px;
-            box-shadow: inset 0 2px 10px rgba(255,255,255,0.05);
+            font-size: 90px;
+            position: relative;
+            overflow: hidden;
         }
-        
-        @keyframes avatarGlow {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+        .card-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 50%;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
         }
-        
-        .info-card {
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 24px;
-            padding: 30px 25px;
-            margin-bottom: 20px;
+        .card-image .mob {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            filter: drop-shadow(0 10px 25px rgba(245,166,35,0.4));
+            position: relative;
+            z-index: 1;
         }
-        
-        .logo-text {
-            font-size: 32px;
+        .card:hover .mob {
+            transform: scale(1.15) rotate(-5deg);
+            filter: drop-shadow(0 15px 35px rgba(245,166,35,0.7));
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+        .card-title {
             font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 5px;
+            font-size: 20px;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .card-desc {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .price {
+            font-weight: 800;
+            font-size: 22px;
+            color: #F5A623;
+            letter-spacing: -0.5px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #F5A623, #E8961A);
+            color: #0D0D0D;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.3px;
+            box-shadow: 0 8px 25px rgba(245,166,35,0.2);
+        }
+        .btn:hover {
+            background: linear-gradient(135deg, #FFD700, #F5A623);
+            box-shadow: 0 12px 35px rgba(245,166,35,0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Секция "О нас" */
+        .about-content {
+            max-width: 650px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .about-content h2 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 25px;
+            letter-spacing: -2px;
             background: linear-gradient(135deg, #F5A623, #FFD700);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
-        
-        .subtitle {
-            color: #888;
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 15px;
+        .about-content p {
+            color: #999;
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 20px;
         }
-        
-        .description {
-            color: #B0B0B0;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 0;
+        .about-content strong { color: #fff; }
+
+        /* Контакты */
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
         }
-        
-        .buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .contact-card {
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 30px;
+            padding: 35px;
+            text-align: center;
+            transition: all 0.3s;
         }
-        
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 18px 24px;
-            border-radius: 50px;
+        .contact-card:hover {
+            border-color: rgba(245,166,35,0.3);
+            transform: translateY(-5px);
+        }
+        .contact-icon { 
+            font-size: 45px; 
+            margin-bottom: 20px;
+            width: 80px; height: 80px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 25px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .contact-title { font-weight: 700; font-size: 18px; margin-bottom: 10px; }
+        .contact-link { 
+            color: #F5A623; 
+            text-decoration: none; 
             font-weight: 600;
-            font-size: 15px;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            border: none;
-            cursor: pointer;
+            transition: color 0.3s;
         }
-        
-        .btn-telegram {
-            background: linear-gradient(135deg, #2AABEE, #229ED9);
-            color: white;
-            box-shadow: 0 10px 30px rgba(42,171,238,0.3);
-        }
-        .btn-telegram:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(42,171,238,0.5);
-        }
-        
-        .btn-gold {
-            background: linear-gradient(135deg, #F5A623, #E8961A);
-            color: #1A1A1A;
-            font-weight: 700;
-            box-shadow: 0 10px 30px rgba(245,166,35,0.4);
-        }
-        .btn-gold:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(245,166,35,0.6);
-        }
-        
-        .btn-social {
-            background: linear-gradient(135deg, #6C5CE7, #A855F7);
-            color: white;
-            box-shadow: 0 10px 30px rgba(108,92,231,0.3);
-        }
-        .btn-social:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(108,92,231,0.5);
-        }
-        
-        .icon {
-            font-size: 22px;
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .divider-line {
-            flex: 1;
-            height: 1px;
-            background: rgba(255,255,255,0.06);
-        }
-        .divider-text {
-            color: #555;
-            font-size: 11px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-        
+        .contact-link:hover { color: #FFD700; }
+
         .footer {
+            text-align: center;
+            padding: 40px 0;
             color: #444;
-            font-size: 12px;
-            margin-top: 25px;
+            font-size: 13px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            margin-top: 80px;
         }
-        .footer a {
-            color: #F5A623;
-            text-decoration: none;
-        }
-        
-        @media (max-width: 480px) {
-            .container { max-width: 100%; }
-            .btn { padding: 16px 20px; font-size: 14px; }
+        .footer a { color: #F5A623; text-decoration: none; font-weight: 600; }
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; align-items: flex-start; border-radius: 30px; }
+            .nav { flex-wrap: wrap; justify-content: center; width: 100%; }
+            .search-bar { width: 100%; }
+            .search-bar:focus { width: 100%; }
+            .section-title { font-size: 30px; }
         }
     </style>
 </head>
 <body>
+
+    <div class="bg-animation"></div>
+    <div class="bg-grid"></div>
+
     <div class="container">
-        
-        <div class="avatar-wrapper">
-            <div class="avatar">🍟</div>
-        </div>
-        
-        <div class="info-card">
-            <div class="logo-text">Fried Projects</div>
-            <div class="subtitle">FPDev • Plugin Studio</div>
-            <p class="description">
-                Разрабатываем плагины для Minecraft на Spigot/Paper.<br>
-                Кастомные механики, оптимизация, интеграции.
-            </p>
-        </div>
-        
-        <div class="buttons">
-            <a href="https://t.me/dikunovvv" class="btn btn-telegram">
-                <span class="icon">⚙️</span> Заказать плагин в Telegram
-                <span style="margin-left: auto; opacity: 0.8; font-size: 13px;">@dikunovvv</span>
+        <!-- Шапка -->
+        <header class="header">
+            <a href="#" class="logo" onclick="switchTab('home')">
+                <div class="logo-icon">🍟</div>
+                FP<span>Dev</span>
             </a>
-            
-            <a href="https://t.me/dikunovvv" class="btn btn-gold">
-                <span class="icon">🛒</span> Другие товары
-                <span style="margin-left: auto; opacity: 0.8; font-size: 13px;">Перевод плагина — 300 ₽</span>
-            </a>
-            
-            <a href="https://t.me/dev_minecraft" class="btn btn-social">
-                <span class="icon">📱</span> Соц-сети
-                <span style="margin-left: auto; opacity: 0.8; font-size: 13px;">@dev_minecraft</span>
-            </a>
+            <nav class="nav">
+                <a onclick="switchTab('home')" class="active" id="nav-home">Витрина</a>
+                <a onclick="switchTab('plugins')" id="nav-plugins">Плагины</a>
+                <a onclick="switchTab('about')" id="nav-about">О нас</a>
+                <a onclick="switchTab('contacts')" id="nav-contacts">Контакты</a>
+            </nav>
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-bar" id="searchInput" placeholder="Поиск услуг..." oninput="filterCards()">
+            </div>
+        </header>
+
+        <!-- Главная -->
+        <div class="section active" id="home">
+            <h2 class="section-title">Что мы делаем</h2>
+            <p class="section-subtitle">Современные решения для серверов Minecraft</p>
+            <div class="grid" id="cardGrid">
+                <div class="card" data-keywords="плагин разработка кастомный экономика кланы">
+                    <div class="card-image"><span class="mob">🐺</span></div>
+                    <div class="card-body">
+                        <div class="card-title">Разработка плагина</div>
+                        <div class="card-desc">Кастомный плагин под ключ для Spigot/Paper. Экономика, кланы, админ-утилиты.</div>
+                        <div class="card-footer">
+                            <div class="price">от 3 000 ₽</div>
+                            <a href="https://t.me/friedprojects" class="btn">Заказать</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" data-keywords="перевод английский русский язык локализация">
+                    <div class="card-image"><span class="mob">🦊</span></div>
+                    <div class="card-body">
+                        <div class="card-title">Перевод плагина</div>
+                        <div class="card-desc">Английский → Русский. Все сообщения, команды, GUI и конфиги.</div>
+                        <div class="card-footer">
+                            <div class="price">300 ₽</div>
+                            <a href="https://t.me/friedprojects" class="btn">Заказать</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="divider">
-            <div class="divider-line"></div>
-            <div class="divider-text">Связь</div>
-            <div class="divider-line"></div>
+
+        <!-- Плагины (та же сетка, что и на главной) -->
+        <div class="section" id="plugins">
+            <h2 class="section-title">Плагины</h2>
+            <p class="section-subtitle">Готовые и кастомные решения</p>
+            <div class="grid" id="cardGridPlugins">
+                <div class="card" data-keywords="плагин разработка кастомный экономика кланы">
+                    <div class="card-image"><span class="mob">🐺</span></div>
+                    <div class="card-body">
+                        <div class="card-title">Разработка плагина</div>
+                        <div class="card-desc">Кастомный плагин под ключ для Spigot/Paper.</div>
+                        <div class="card-footer">
+                            <div class="price">от 3 000 ₽</div>
+                            <a href="https://t.me/friedprojects" class="btn">Заказать</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" data-keywords="перевод английский русский язык локализация">
+                    <div class="card-image"><span class="mob">🦊</span></div>
+                    <div class="card-body">
+                        <div class="card-title">Перевод плагина</div>
+                        <div class="card-desc">Английский → Русский. Команды, GUI, конфиги.</div>
+                        <div class="card-footer">
+                            <div class="price">300 ₽</div>
+                            <a href="https://t.me/friedprojects" class="btn">Заказать</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="footer">
-            © 2025 <a href="https://fried.webtm.ru">FPDev</a> • Все права защищены
+
+        <!-- О нас -->
+        <div class="section" id="about">
+            <div class="about-content">
+                <h2>FPDev</h2>
+                <p>Мы создаём <strong>решения для серверов Minecraft</strong>.</p>
+                <p>Плагины, переводы, оптимизация, готовая сборка — всё, что нужно твоему проекту.</p>
+                <p>Наш подход: <strong>чистый код, асинхронность, надёжность</strong>. Без компромиссов.</p>
+                <br>
+                <a href="https://t.me/friedprojects" class="btn">Написать нам</a>
+            </div>
         </div>
-        
+
+        <!-- Контакты -->
+        <div class="section" id="contacts">
+            <h2 class="section-title">Связь</h2>
+            <p class="section-subtitle">Выберите удобный способ</p>
+            <div class="contacts-grid">
+                <div class="contact-card">
+                    <div class="contact-icon">📱</div>
+                    <div class="contact-title">Telegram-канал</div>
+                    <a href="https://t.me/dev_minecraft" class="contact-link">@dev_minecraft</a>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon">💬</div>
+                    <div class="contact-title">Telegram-чат</div>
+                    <a href="https://t.me/minecraft_devhub" class="contact-link">@minecraft_devhub</a>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon">🛒</div>
+                    <div class="contact-title">Заказать услугу</div>
+                    <a href="https://t.me/friedprojects" class="contact-link">@friedprojects</a>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            © 2026 <a href="#">FPDev</a> — решения для серверов Minecraft.<br>
+            <a href="https://t.me/dev_minecraft">@dev_minecraft</a> · 
+            <a href="https://t.me/minecraft_devhub">@minecraft_devhub</a> · 
+            <a href="https://t.me/friedprojects">@friedprojects</a>
+        </footer>
     </div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav a').forEach(n => n.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('nav-' + tabId).classList.add('active');
+        }
+
+        function filterCards() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const activeSection = document.querySelector('.section.active');
+            const cards = activeSection.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                const keywords = card.dataset.keywords || '';
+                const title = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+                const desc = card.querySelector('.card-desc')?.textContent.toLowerCase() || '';
+                const matches = keywords.includes(query) || title.includes(query) || desc.includes(query);
+                card.style.display = matches ? '' : 'none';
+            });
+        }
+    </script>
+
 </body>
 </html>
